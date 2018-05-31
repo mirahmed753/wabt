@@ -94,6 +94,11 @@ struct Const {
     return Const(V128Tag(), val, loc);
   }
 
+  // Reference Type
+  static Const R32(uint32_t val = 0, const Location& loc = Location()) {
+    return Const(R32Tag(), val, loc);
+  }
+
   Location loc;
   Type type;
   union {
@@ -111,12 +116,14 @@ struct Const {
   struct F32Tag {};
   struct F64Tag {};
   struct V128Tag {};
+  struct R32Tag {};
 
   Const(I32Tag, uint32_t val = 0, const Location& loc = Location());
   Const(I64Tag, uint64_t val = 0, const Location& loc = Location());
   Const(F32Tag, uint32_t val = 0, const Location& loc = Location());
   Const(F64Tag, uint64_t val = 0, const Location& loc = Location());
   Const(V128Tag, v128 val = {{0, 0, 0, 0}}, const Location& loc = Location());
+  Const(R32Tag, uint32_t val = 0, const Location& loc = Location());
 };
 typedef std::vector<Const> ConstVector;
 

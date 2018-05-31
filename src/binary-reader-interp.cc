@@ -175,6 +175,9 @@ class BinaryReaderInterp : public BinaryReaderNop {
   wabt::Result OnGetLocalExpr(Index local_index) override;
   wabt::Result OnI32ConstExpr(uint32_t value) override;
   wabt::Result OnI64ConstExpr(uint64_t value) override;
+
+  wabt::Result OnR32ConstExpr(uint32_t value) override;
+
   wabt::Result OnIfExpr(Index num_types, Type* sig_types) override;
   wabt::Result OnLoadExpr(wabt::Opcode opcode,
                           uint32_t alignment_log2,
@@ -216,6 +219,8 @@ class BinaryReaderInterp : public BinaryReaderNop {
   wabt::Result OnInitExprI32ConstExpr(Index index, uint32_t value) override;
   wabt::Result OnInitExprI64ConstExpr(Index index, uint64_t value) override;
 
+  wabt::Result OnInitExprR32ConstExpr(Index index, uint32_t value) override;
+
  private:
   Label* GetLabel(Index depth);
   Label* TopLabel();
@@ -246,6 +251,9 @@ class BinaryReaderInterp : public BinaryReaderNop {
   wabt::Result EmitI8(uint8_t value);
   wabt::Result EmitI32(uint32_t value);
   wabt::Result EmitI64(uint64_t value);
+
+  wabt::Result EmitR32(uint32_t value);
+
   wabt::Result EmitV128(v128 value);
   wabt::Result EmitI32At(IstreamOffset offset, uint32_t value);
   wabt::Result EmitDropKeep(uint32_t drop, uint8_t keep);
@@ -430,6 +438,10 @@ wabt::Result BinaryReaderInterp::EmitI32(uint32_t value) {
 }
 
 wabt::Result BinaryReaderInterp::EmitI64(uint64_t value) {
+  return EmitData(&value, sizeof(value));
+}
+
+wabt::Result BinaryReaderInterp::EmitR32(uint32_t value) {
   return EmitData(&value, sizeof(value));
 }
 
@@ -956,6 +968,13 @@ wabt::Result BinaryReaderInterp::OnInitExprI64ConstExpr(Index index,
   return wabt::Result::Ok;
 }
 
+wabt::Result BinaryReaderInterp::OnInitExprR32ConstExpr(Index index,
+                                                        uint32_t value) {
+  init_expr_value_.type = Type::R32;
+  init_expr_value_.value.r32 = value;
+  return wabt::Result::Ok;
+}
+
 wabt::Result BinaryReaderInterp::OnExport(Index index,
                                           ExternalKind kind,
                                           Index item_index,
@@ -1402,6 +1421,13 @@ wabt::Result BinaryReaderInterp::OnI64ConstExpr(uint64_t value) {
   CHECK_RESULT(typechecker_.OnConst(Type::I64));
   CHECK_RESULT(EmitOpcode(Opcode::I64Const));
   CHECK_RESULT(EmitI64(value));
+  return wabt::Result::Ok;
+}
+
+wabt::Result BinaryReaderInterp::OnR32ConstExpr(uint32_t value) {
+  CHECK_RESULT(typechecker_.OnConst(Type::R32));
+  CHECK_RESULT(EmitOpcode(Opcode::R32Const));
+  CHECK_RESULT(EmitR32(value));
   return wabt::Result::Ok;
 }
 

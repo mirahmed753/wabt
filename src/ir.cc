@@ -603,4 +603,8 @@ Const::Const(F64Tag, uint64_t value, const Location& loc_)
 Const::Const(V128Tag, v128 value, const Location& loc_)
     : loc(loc_), type(Type::V128), v128_bits(value) {}
 
+// Reference Type
+Const::Const(R32Tag, uint32_t value, const Location& loc_)
+    : loc(loc_), type(Type::R32), u32(value) {}
+
 }  // namespace wabt

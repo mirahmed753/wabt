@@ -478,6 +478,7 @@ char CWriter::MangleType(Type type) {
     case Type::I64: return 'j';
     case Type::F32: return 'f';
     case Type::F64: return 'd';
+    // case Type::R32: return '?'; What is this even supposed to be?
     default: WABT_UNREACHABLE;
   }
 }
@@ -750,6 +751,7 @@ void CWriter::Write(Type type) {
     case Type::I64: Write("u64"); break;
     case Type::F32: Write("f32"); break;
     case Type::F64: Write("f64"); break;
+    case Type::R32: Write("u32"); break;
     default:
       WABT_UNREACHABLE;
   }
@@ -761,6 +763,7 @@ void CWriter::Write(TypeEnum type) {
     case Type::I64: Write("WASM_RT_I64"); break;
     case Type::F32: Write("WASM_RT_F32"); break;
     case Type::F64: Write("WASM_RT_F64"); break;
+    case Type::R32: Write("WASM_RT_R32"); break;
     default:
       WABT_UNREACHABLE;
   }
@@ -836,6 +839,10 @@ void CWriter::Write(const Const& const_) {
         Writef("%.17g", Bitcast<double>(const_.f64_bits));
       }
       break;
+
+    case Type::R32:
+        Writef("%uu", static_cast<int32_t>(const_.u32));
+        break;
 
     default:
       WABT_UNREACHABLE;
@@ -1335,7 +1342,7 @@ void CWriter::WriteLocals() {
   std::vector<std::string> index_to_name;
   MakeTypeBindingReverseMapping(func_->local_types.size(),
                                 func_->local_bindings, &index_to_name);
-  for (Type type : {Type::I32, Type::I64, Type::F32, Type::F64}) {
+  for (Type type : {Type::I32, Type::I64, Type::F32, Type::F64, Type::R32}) {
     Index local_index = 0;
     size_t count = 0;
     for (Type local_type : func_->local_types) {
@@ -1362,7 +1369,7 @@ void CWriter::WriteLocals() {
 }
 
 void CWriter::WriteStackVarDeclarations() {
-  for (Type type : {Type::I32, Type::I64, Type::F32, Type::F64}) {
+  for (Type type : {Type::I32, Type::I64, Type::F32, Type::F64, Type::R32}) {
     size_t count = 0;
     for (const auto& pair : stack_var_sym_map_) {
       Type stp_type = pair.first.second;
@@ -1705,6 +1712,7 @@ void CWriter::Write(const BinaryExpr& expr) {
     case Opcode::I64Add:
     case Opcode::F32Add:
     case Opcode::F64Add:
+    case Opcode::R32Add:
       WriteInfixBinaryExpr(expr.opcode, "+");
       break;
 
@@ -1712,6 +1720,7 @@ void CWriter::Write(const BinaryExpr& expr) {
     case Opcode::I64Sub:
     case Opcode::F32Sub:
     case Opcode::F64Sub:
+    case Opcode::R32Sub:
       WriteInfixBinaryExpr(expr.opcode, "-");
       break;
 
@@ -1719,6 +1728,7 @@ void CWriter::Write(const BinaryExpr& expr) {
     case Opcode::I64Mul:
     case Opcode::F32Mul:
     case Opcode::F64Mul:
+    case Opcode::R32Mul:
       WriteInfixBinaryExpr(expr.opcode, "*");
       break;
 
@@ -1740,6 +1750,10 @@ void CWriter::Write(const BinaryExpr& expr) {
       WriteInfixBinaryExpr(expr.opcode, "/");
       break;
 
+    case Opcode::R32DivS:
+      WritePrefixBinaryExpr(expr.opcode, "R32_DIV_S");
+      break;
+
     case Opcode::I32RemS:
       WritePrefixBinaryExpr(expr.opcode, "I32_REM_S");
       break;
@@ -1748,35 +1762,45 @@ void CWriter::Write(const BinaryExpr& expr) {
       WritePrefixBinaryExpr(expr.opcode, "I64_REM_S");
       break;
 
+    case Opcode::R32RemS:
+      WritePrefixBinaryExpr(expr.opcode, "R32_REM_S");
+      break;
+
     case Opcode::I32RemU:
     case Opcode::I64RemU:
+    case Opcode::R32RemU:
       WritePrefixBinaryExpr(expr.opcode, "REM_U");
       break;
 
     case Opcode::I32And:
     case Opcode::I64And:
+    case Opcode::R32And:
       WriteInfixBinaryExpr(expr.opcode, "&");
       break;
 
     case Opcode::I32Or:
     case Opcode::I64Or:
+    case Opcode::R32Or:
       WriteInfixBinaryExpr(expr.opcode, "|");
       break;
 
     case Opcode::I32Xor:
     case Opcode::I64Xor:
+    case Opcode::R32Xor:
       WriteInfixBinaryExpr(expr.opcode, "^");
       break;
 
     case Opcode::I32Shl:
     case Opcode::I64Shl:
+    case Opcode::R32Shl:
       Write(StackVar(1), " <<= (", StackVar(0), " & ",
             GetShiftMask(expr.opcode.GetResultType()), ");", Newline());
       DropTypes(1);
       break;
 
     case Opcode::I32ShrS:
-    case Opcode::I64ShrS: {
+    case Opcode::I64ShrS:
+    case Opcode::R32ShrS:{
       Type type = expr.opcode.GetResultType();
       Write(StackVar(1), " = (", type, ")((", SignedType(type), ")",
             StackVar(1), " >> (", StackVar(0), " & ", GetShiftMask(type), "));",
@@ -1787,6 +1811,7 @@ void CWriter::Write(const BinaryExpr& expr) {
 
     case Opcode::I32ShrU:
     case Opcode::I64ShrU:
+    case Opcode::R32ShrU:
       Write(StackVar(1), " >>= (", StackVar(0), " & ",
             GetShiftMask(expr.opcode.GetResultType()), ");", Newline());
       DropTypes(1);
@@ -1800,12 +1825,20 @@ void CWriter::Write(const BinaryExpr& expr) {
       WritePrefixBinaryExpr(expr.opcode, "I64_ROTL");
       break;
 
+    case Opcode::R32Rotl:
+      WritePrefixBinaryExpr(expr.opcode, "R32_ROTL");
+      break;
+
     case Opcode::I32Rotr:
       WritePrefixBinaryExpr(expr.opcode, "I32_ROTR");
       break;
 
     case Opcode::I64Rotr:
       WritePrefixBinaryExpr(expr.opcode, "I64_ROTR");
+      break;
+
+    case Opcode::R64Rotr:
+      WritePrefixBinaryExpr(expr.opcode, "R64_ROTR");
       break;
 
     case Opcode::F32Min:
@@ -1837,6 +1870,7 @@ void CWriter::Write(const CompareExpr& expr) {
     case Opcode::I64Eq:
     case Opcode::F32Eq:
     case Opcode::F64Eq:
+    case Opcode::R32Eq:
       WriteInfixBinaryExpr(expr.opcode, "==", AssignOp::Disallowed);
       break;
 
@@ -1844,6 +1878,7 @@ void CWriter::Write(const CompareExpr& expr) {
     case Opcode::I64Ne:
     case Opcode::F32Ne:
     case Opcode::F64Ne:
+    case Opcode::R32Ne:
       WriteInfixBinaryExpr(expr.opcode, "!=", AssignOp::Disallowed);
       break;
 
@@ -1856,6 +1891,7 @@ void CWriter::Write(const CompareExpr& expr) {
     case Opcode::I64LtU:
     case Opcode::F32Lt:
     case Opcode::F64Lt:
+    case Opcode::R32Lt:
       WriteInfixBinaryExpr(expr.opcode, "<", AssignOp::Disallowed);
       break;
 
@@ -1868,6 +1904,7 @@ void CWriter::Write(const CompareExpr& expr) {
     case Opcode::I64LeU:
     case Opcode::F32Le:
     case Opcode::F64Le:
+    case Opcode::R32Le:
       WriteInfixBinaryExpr(expr.opcode, "<=", AssignOp::Disallowed);
       break;
 
@@ -1880,6 +1917,7 @@ void CWriter::Write(const CompareExpr& expr) {
     case Opcode::I64GtU:
     case Opcode::F32Gt:
     case Opcode::F64Gt:
+    case Opcode::R32Gt:
       WriteInfixBinaryExpr(expr.opcode, ">", AssignOp::Disallowed);
       break;
 
@@ -1892,6 +1930,7 @@ void CWriter::Write(const CompareExpr& expr) {
     case Opcode::I64GeU:
     case Opcode::F32Ge:
     case Opcode::F64Ge:
+    case Opcode::R32Ge:
       WriteInfixBinaryExpr(expr.opcode, ">=", AssignOp::Disallowed);
       break;
 
@@ -2038,6 +2077,7 @@ void CWriter::Write(const LoadExpr& expr) {
     case Opcode::I64Load16U: func = "i32_load16_u"; break;
     case Opcode::I64Load32S: func = "i64_load32_s"; break;
     case Opcode::I64Load32U: func = "i64_load32_u"; break;
+    case Opcode::R32Load: func = "r32_load"; break;
 
     default:
       WABT_UNREACHABLE;
@@ -2068,6 +2108,7 @@ void CWriter::Write(const StoreExpr& expr) {
     case Opcode::I32Store16: func = "i32_store16"; break;
     case Opcode::I64Store16: func = "i64_store16"; break;
     case Opcode::I64Store32: func = "i64_store32"; break;
+    case Opcode::R32Store: func = "r32_store"; break;
 
     default:
       WABT_UNREACHABLE;

@@ -469,6 +469,12 @@ void BinaryWriter::WriteExpr(const Func* func, const Expr* expr) {
           WriteOpcode(stream_, Opcode::V128Const);
           stream_->WriteU128(const_.v128_bits, "v128 literal");
           break;
+        // Reference Type
+        case Type::R32: {
+          WriteOpcode(stream_, Opcode::R32Const);
+          WriteS32Leb128(stream_, const_.u32, "r32 literal");
+          break;
+        }
         default:
           assert(0);
       }

@@ -1246,6 +1246,7 @@ void Validator::CheckExcept(const Location* loc, const Exception* except) {
       case Type::F32:
       case Type::F64:
       case Type::V128:
+      case Type::R32:
         break;
       default:
         PrintError(loc, "Invalid exception type: %s", GetTypeName(ty));

@@ -211,6 +211,7 @@ enum class Type {
   Func = 0x60,
   Void = 0x40,
   ExceptRef = 0x3f,
+  R32 = 0x30
   ___ = Void, /* convenient for the opcode table in opcode.h */
   Any = 0,    /* Not actually specified, but useful for type-checking */
 };
@@ -355,6 +356,8 @@ static WABT_INLINE const char* GetTypeName(Type type) {
       return "void";
     case Type::Any:
       return "any";
+    case Type::R32:
+      return "r32";
   }
   WABT_UNREACHABLE;
 }

@@ -200,6 +200,14 @@ void BinaryWriterSpec::WriteConst(const Const& const_) {
       break;
     }
 
+    // Reference Type
+    case Type::R32:
+      WriteString("r32");
+      WriteSeparator();
+      WriteKey("value");
+      json_stream_->Writef("\"%u\"", const_.u32);
+      break;
+
     default:
       assert(0);
   }
