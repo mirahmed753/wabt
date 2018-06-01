@@ -369,6 +369,7 @@ bool BinaryReader::is_concrete_type(Type type) {
     case Type::I64:
     case Type::F32:
     case Type::F64:
+    case Type::R32:
       return true;
 
     case Type::V128:
@@ -442,6 +443,13 @@ Result BinaryReader::ReadInitExpr(Index index, bool require_i32) {
       ZeroMemory(value_bits);
       CHECK_RESULT(ReadV128(&value_bits, "init_expr v128.const value"));
       CALLBACK(OnInitExprV128ConstExpr, index, value_bits);
+      break;
+    }
+
+    case Opcode::R32Const: {
+      uint32_t value = 0;
+      CHECK_RESULT(ReadS32Leb128(&value, "init_expr r32.const value"));
+      CALLBACK(OnInitExprR32ConstExpr, index, value);
       break;
     }
 

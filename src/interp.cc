@@ -1509,6 +1509,10 @@ Result Thread::Run(int num_instructions) {
         CHECK_TRAP(PushRep<double>(ReadU64(&pc)));
         break;
 
+      case Opcode::R32Const:
+        CHECK_TRAP(Push<uint32_t>(ReadU32(&pc))); // Should this be <uint32_t>?
+        break;
+
       case Opcode::GetGlobal: {
         Index index = ReadU32(&pc);
         assert(index < env_->globals_.size());
@@ -3232,6 +3236,10 @@ void Thread::Trace(Stream* stream) {
                      Bitcast<double>(ReadU64At(pc)));
       break;
 
+    case Opcode::R32Const:
+      stream->Writef("%s $%u\n", opcode.GetName(), ReadU32At(pc)); // is this the correct Writef?
+      break;
+
     case Opcode::GetLocal:
     case Opcode::GetGlobal:
       stream->Writef("%s $%u\n", opcode.GetName(), ReadU32At(pc));
@@ -3918,6 +3926,10 @@ void Environment::Disassemble(Stream* stream,
       case Opcode::F64Const:
         stream->Writef("%s $%g\n", opcode.GetName(),
                        Bitcast<double>(ReadU64(&pc)));
+        break;
+
+      case Opcode::R32Const:
+        stream->Writef("%s $%u\n", opcode.GetName(), ReadU32(&pc));
         break;
 
       case Opcode::GetLocal:
