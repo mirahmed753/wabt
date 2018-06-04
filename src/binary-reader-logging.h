@@ -132,6 +132,7 @@ class BinaryReaderLogging : public BinaryReaderDelegate {
   Result OnOpcodeUint64(uint64_t value) override;
   Result OnOpcodeF32(uint32_t value) override;
   Result OnOpcodeF64(uint64_t value) override;
+  Result OnOpcodeR32(uint32_t value) override;
   Result OnOpcodeV128(v128 value) override;
   Result OnOpcodeBlockSig(Index num_types, Type* sig_types) override;
   Result OnAtomicLoadExpr(Opcode opcode,
@@ -169,6 +170,7 @@ class BinaryReaderLogging : public BinaryReaderDelegate {
   Result OnGetLocalExpr(Index local_index) override;
   Result OnI32ConstExpr(uint32_t value) override;
   Result OnI64ConstExpr(uint64_t value) override;
+  Result OnR32ConstExpr(uint32_t value) override;
   Result OnIfExpr(Index num_types, Type* sig_types) override;
   Result OnIfExceptExpr(Index num_types,
                         Type* sig_types,
@@ -295,6 +297,7 @@ class BinaryReaderLogging : public BinaryReaderDelegate {
   Result OnInitExprGetGlobalExpr(Index index, Index global_index) override;
   Result OnInitExprI32ConstExpr(Index index, uint32_t value) override;
   Result OnInitExprI64ConstExpr(Index index, uint64_t value) override;
+  Result OnInitExprR32ConstExpr(Index index, uint32_t value) override;
 
  private:
   void Indent();

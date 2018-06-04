@@ -323,6 +323,11 @@ Result BinaryReaderLogging::OnI64ConstExpr(uint64_t value) {
   return reader_->OnI64ConstExpr(value);
 }
 
+Result BinaryReaderLogging::OnR32ConstExpr(uint32_t value) {
+  LOGF("OnR32ConstExpr(%u (0x%x))\n", value, value);
+  return reader_->OnR32ConstExpr(value);
+}
+
 Result BinaryReaderLogging::OnIfExpr(Index num_types, Type* sig_types) {
   LOGF("OnIfExpr(sig: ");
   LogTypes(num_types, sig_types);
@@ -460,6 +465,13 @@ Result BinaryReaderLogging::OnInitExprI64ConstExpr(Index index,
   LOGF("OnInitExprI64ConstExpr(index: %" PRIindex ", value: %" PRIu64 ")\n",
        index, value);
   return reader_->OnInitExprI64ConstExpr(index, value);
+}
+
+Result BinaryReaderLogging::OnInitExprR32ConstExpr(Index index,
+                                                   uint32_t value) {
+  LOGF("OnInitExprR32ConstExpr(index: %" PRIindex ", value: %u)\n", index,
+       value);
+  return reader_->OnInitExprR32ConstExpr(index, value);
 }
 
 Result BinaryReaderLogging::OnRelocCount(Index count,
@@ -751,6 +763,10 @@ Result BinaryReaderLogging::OnOpcodeF64(uint64_t value) {
 
 Result BinaryReaderLogging::OnOpcodeV128(v128 value) {
   return reader_->OnOpcodeV128(value);
+}
+
+Result BinaryReaderLogging::OnOpcodeR32(uint32_t value) {
+  return reader_->OnOpcodeR32(value);
 }
 
 Result BinaryReaderLogging::OnOpcodeBlockSig(Index num_types, Type* sig_types) {

@@ -181,6 +181,7 @@ class BinaryReaderDelegate {
   virtual Result OnOpcodeUint64(uint64_t value) = 0;
   virtual Result OnOpcodeF32(uint32_t value) = 0;
   virtual Result OnOpcodeF64(uint64_t value) = 0;
+  virtual Result OnOpcodeR32(uint32_t value) = 0; // My Error
   virtual Result OnOpcodeV128(v128 value) = 0;
   virtual Result OnOpcodeBlockSig(Index num_types, Type* sig_types) = 0;
   virtual Result OnAtomicLoadExpr(Opcode opcode,
@@ -224,6 +225,7 @@ class BinaryReaderDelegate {
   virtual Result OnGetLocalExpr(Index local_index) = 0;
   virtual Result OnI32ConstExpr(uint32_t value) = 0;
   virtual Result OnI64ConstExpr(uint64_t value) = 0;
+  virtual Result OnR32ConstExpr(uint32_t value) = 0;
   virtual Result OnIfExpr(Index num_types, Type* sig_types) = 0;
   virtual Result OnIfExceptExpr(Index num_types,
                                 Type* sig_types,
@@ -358,6 +360,7 @@ class BinaryReaderDelegate {
   virtual Result OnInitExprGetGlobalExpr(Index index, Index global_index) = 0;
   virtual Result OnInitExprI32ConstExpr(Index index, uint32_t value) = 0;
   virtual Result OnInitExprI64ConstExpr(Index index, uint64_t value) = 0;
+  virtual Result OnInitExprR32ConstExpr(Index index, uint32_t value) = 0;
 
   const State* state = nullptr;
 };

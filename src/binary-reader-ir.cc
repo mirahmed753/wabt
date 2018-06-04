@@ -156,6 +156,7 @@ class BinaryReaderIR : public BinaryReaderNop {
   Result OnGetLocalExpr(Index local_index) override;
   Result OnI32ConstExpr(uint32_t value) override;
   Result OnI64ConstExpr(uint64_t value) override;
+  Result OnR32ConstExpr(uint32_t value) override;
   Result OnIfExpr(Index num_types, Type* sig_types) override;
   Result OnIfExceptExpr(Index num_types,
                         Type* sig_types,
@@ -220,6 +221,7 @@ class BinaryReaderIR : public BinaryReaderNop {
   Result OnInitExprGetGlobalExpr(Index index, Index global_index) override;
   Result OnInitExprI32ConstExpr(Index index, uint32_t value) override;
   Result OnInitExprI64ConstExpr(Index index, uint64_t value) override;
+  Result OnInitExprR32ConstExpr(Index index, uint32_t value) override;
 
  private:
   bool HandleError(ErrorLevel, Offset offset, const char* message);
@@ -706,6 +708,11 @@ Result BinaryReaderIR::OnI64ConstExpr(uint64_t value) {
   return AppendExpr(MakeUnique<ConstExpr>(Const::I64(value, GetLocation())));
 }
 
+// Trying this for Ref Types
+Result BinaryReaderIR::OnR32ConstExpr(uint32_t value) {
+  return AppendExpr(MakeUnique<ConstExpr>(Const::R32(value, GetLocation())));
+}
+
 Result BinaryReaderIR::OnIfExpr(Index num_types, Type* sig_types) {
   auto expr = MakeUnique<IfExpr>();
   expr->true_.sig.assign(sig_types, sig_types + num_types);
@@ -1021,6 +1028,13 @@ Result BinaryReaderIR::OnInitExprI64ConstExpr(Index index, uint64_t value) {
   Location loc = GetLocation();
   current_init_expr_->push_back(
       MakeUnique<ConstExpr>(Const::I64(value, loc), loc));
+  return Result::Ok;
+}
+
+Result BinaryReaderIR::OnInitExprR32ConstExpr(Index index, uint32_t value) {
+  Location loc = GetLocation();
+  current_init_expr_->push_back(
+      MakeUnique<ConstExpr>(Const::R32(value, loc), loc));
   return Result::Ok;
 }
 

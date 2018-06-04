@@ -340,6 +340,7 @@ class BinaryReaderObjdumpDisassemble : public BinaryReaderObjdumpBase {
   Result OnOpcodeUint64(uint64_t value) override;
   Result OnOpcodeF32(uint32_t value) override;
   Result OnOpcodeF64(uint64_t value) override;
+  // Result OnOpcodeR32(uint32_t value) override;
   Result OnOpcodeBlockSig(Index num_types, Type* sig_types) override;
 
   Result OnBrTableExpr(Index num_targets,
@@ -535,6 +536,12 @@ Result BinaryReaderObjdumpDisassemble::OnOpcodeF64(uint64_t value) {
   return Result::Ok;
 }
 
+// Result BinaryReaderObjdumpDisassemble::OnOpcodeR32(uint32_t value) {
+//   Offset immediate_len = state->offset - current_opcode_offset;
+//   LogOpcode(data_, immediate_len, "%u", value);
+//   return Result::Ok;
+// }
+
 Result BinaryReaderObjdumpDisassemble::OnBrTableExpr(
     Index num_targets,
     Index* target_depths,
@@ -599,6 +606,7 @@ enum class InitExprType {
   F32,
   I64,
   F64,
+  R32,
   V128,
   Global,
 };
@@ -609,6 +617,7 @@ struct InitExpr {
     Index global;
     uint32_t i32;
     uint32_t f32;
+    uint32_t r32;
     uint64_t i64;
     uint64_t f64;
     v128 v128_v;
@@ -719,6 +728,7 @@ class BinaryReaderObjdump : public BinaryReaderObjdumpBase {
   Result OnInitExprGetGlobalExpr(Index index, Index global_index) override;
   Result OnInitExprI32ConstExpr(Index index, uint32_t value) override;
   Result OnInitExprI64ConstExpr(Index index, uint64_t value) override;
+  Result OnInitExprR32ConstExpr(Index index, uint32_t value) override;
 
   Result OnRelocCount(Index count, Index section_index) override;
   Result OnReloc(RelocType type,
@@ -1119,6 +1129,9 @@ void BinaryReaderObjdump::PrintInitExpr(const InitExpr& expr) {
       PrintDetails(" - init f32=%s\n", buffer);
       break;
     }
+    case InitExprType::R32:
+      PrintDetails(" - init r32=%d\n", expr.value.r32);
+      break;
     case InitExprType::V128: {
       PrintDetails(" - init v128=0x%08x 0x%08x 0x%08x 0x%08x \n",
                    expr.value.v128_v.v[0], expr.value.v128_v.v[1],
@@ -1208,6 +1221,19 @@ Result BinaryReaderObjdump::OnInitExprI64ConstExpr(Index index,
   return Result::Ok;
 }
 
+Result BinaryReaderObjdump::OnInitExprR32ConstExpr(Index index,
+                                                   uint32_t value) {
+  InitExpr expr;
+  expr.type = InitExprType::R32;
+  expr.value.r32 = value;
+  if (in_data_section_) {
+    data_init_expr_ = expr;
+  } else {
+    PrintInitExpr(expr);
+  }
+  return Result::Ok;
+}
+
 Result BinaryReaderObjdump::OnModuleName(string_view name) {
   PrintDetails(" - module <" PRIstringview ">\n",
                WABT_PRINTF_STRING_VIEW_ARG(name));
@@ -1261,6 +1287,7 @@ Result BinaryReaderObjdump::OnDataSegmentData(Index index,
     case InitExprType::I64:
     case InitExprType::F32:
     case InitExprType::F64:
+    case InitExprType::R32:
     case InitExprType::V128:
       fprintf(stderr, "Segment offset must be an i32 init expr");
       return Result::Error;

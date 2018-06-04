@@ -190,6 +190,7 @@ class BinaryReaderOpcnt : public BinaryReaderNop {
   Result OnOpcodeUint64(uint64_t value) override;
   Result OnOpcodeF32(uint32_t value) override;
   Result OnOpcodeF64(uint64_t value) override;
+  Result OnOpcodeR32(uint32_t value) override;
   Result OnOpcodeBlockSig(Index num_types, Type* sig_types) override;
   Result OnBrTableExpr(Index num_targets,
                        Index* target_depths,
@@ -252,6 +253,10 @@ Result BinaryReaderOpcnt::OnOpcodeF32(uint32_t value) {
 
 Result BinaryReaderOpcnt::OnOpcodeF64(uint64_t value) {
   return Emplace(current_opcode_, OpcodeInfo::Kind::Float64, &value);
+}
+
+Result BinaryReaderOpcnt::OnOpcodeR32(uint32_t value) {
+  return Emplace(current_opcode_, OpcodeInfo::Kind::Uint32, &value);
 }
 
 Result BinaryReaderOpcnt::OnOpcodeBlockSig(Index num_types, Type* sig_types) {

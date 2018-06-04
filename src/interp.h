@@ -140,6 +140,7 @@ using ValueTypeRep = typename ValueTypeRepT<T>::type;
 union Value {
   uint32_t i32;
   uint64_t i64;
+  uint32_t r32;
   ValueTypeRep<float> f32_bits;
   ValueTypeRep<double> f64_bits;
   ValueTypeRep<v128> v128_bits;
