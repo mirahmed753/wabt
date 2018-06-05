@@ -225,6 +225,7 @@ class BinaryReaderNop : public BinaryReaderDelegate {
   Result OnEndFunc() override { return Result::Ok; }
   Result OnF32ConstExpr(uint32_t value_bits) override { return Result::Ok; }
   Result OnF64ConstExpr(uint64_t value_bits) override { return Result::Ok; }
+  Result OnR32ConstExpr(uint32_t value_bits) override { return Result::Ok; }
   Result OnV128ConstExpr(v128 value_bits) override { return Result::Ok; }
   Result OnGetGlobalExpr(Index global_index) override { return Result::Ok; }
   Result OnGetLocalExpr(Index local_index) override { return Result::Ok; }
@@ -433,6 +434,9 @@ class BinaryReaderNop : public BinaryReaderDelegate {
     return Result::Ok;
   }
   Result OnInitExprI64ConstExpr(Index index, uint64_t value) override {
+    return Result::Ok;
+  }
+  Result OnInitExprR32ConstExpr(Index index, uint32_t value) override {
     return Result::Ok;
   }
 };

@@ -207,6 +207,7 @@ enum class Type {
   F32 = 0x7D,
   F64 = 0x7C,
   R32 = 0x80, // Change to valid number later
+  R64 = 0x81, // Change to valid number later
   V128 = 0x7B,
   Anyfunc = 0x70,
   Func = 0x60,
@@ -358,6 +359,8 @@ static WABT_INLINE const char* GetTypeName(Type type) {
       return "any";
     case Type::R32:
       return "r32";
+    case Type::R64:
+      return "r64";
   }
   WABT_UNREACHABLE;
 }
