@@ -589,7 +589,7 @@ bool WastParser::ParseVarListOpt(VarVector* out_var_list) {
 Result WastParser::ParseValueType(Type* out_type) {
   WABT_TRACE(ParseValueType);
   if (!PeekMatch(TokenType::ValueType)) {
-    return ErrorExpected({"i32", "i64", "f32", "f64", "v128"});
+    return ErrorExpected({"i32", "i64", "f32", "f64", "v128", "r32"});
   }
 
   *out_type = Consume().type();
@@ -1989,7 +1989,7 @@ Result WastParser::ParseGlobalType(Global* global) {
   if (MatchLpar(TokenType::Mut)) {
     global->mutable_ = true;
     CHECK_RESULT(ParseValueType(&global->type));
-    CHECK_RESULT(ErrorIfLpar({"i32", "i64", "f32", "f64"}));
+    CHECK_RESULT(ErrorIfLpar({"i32", "i64", "f32", "f64", "r32"}));
     EXPECT(Rpar);
   } else {
     CHECK_RESULT(ParseValueType(&global->type));

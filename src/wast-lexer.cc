@@ -257,7 +257,7 @@ Token WastLexer::GetToken(WastParser* parser) {
       <i> "i32"                 { RETURN_TYPE(ValueType, I32); }
       <i> "i64"                 { RETURN_TYPE(ValueType, I64); }
       <i> "r32"                 { RETURN_TYPE(ValueType, R32); }
-      <i> "r64"                 { RETURN_TYPE(ValueType, R32); }
+      <i> "r64"                 { RETURN_TYPE(ValueType, R64); }
       <i> "f32"                 { RETURN_TYPE(ValueType, F32); }
       <i> "f64"                 { RETURN_TYPE(ValueType, F64); }
       <i> "v128"                { RETURN_TYPE(ValueType, V128); }
