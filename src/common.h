@@ -206,7 +206,7 @@ enum class Type {
   I64 = 0x7E,
   F32 = 0x7D,
   F64 = 0x7C,
-  R32 = 0x80, // Change to valid number later
+  R32 = 0x30, // Change to valid number later
   R64 = 0x81, // Change to valid number later
   V128 = 0x7B,
   Anyfunc = 0x70,
