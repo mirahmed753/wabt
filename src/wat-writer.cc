@@ -511,6 +511,12 @@ void WatWriter::WriteConst(const Const& const_) {
       break;
     }
 
+    case Type::R32:
+      WritePutsSpace(Opcode::R32Const_Opcode.GetName());
+      Writef("%d", static_cast<int32_t>(0));
+      WriteNewline(NO_FORCE_NEWLINE);
+      break;
+
     default:
       assert(0);
       break;
