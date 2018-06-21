@@ -692,8 +692,7 @@ Result BinaryReader::ReadFunctionBody(Offset end_offset) {
       }
 
       case Opcode::R32Const: {
-        uint32_t value;
-        CHECK_RESULT(ReadS32Leb128(&value, "r32.const value"));
+        uint32_t value = 0;
         CALLBACK(OnR32ConstExpr, value);
         CALLBACK(OnOpcodeR32, value);
         break;
