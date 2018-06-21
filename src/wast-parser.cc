@@ -1612,6 +1612,7 @@ Result WastParser::ParseConst(Const* const_) {
       return ErrorExpected({"a numeric literal"}, "123, -45, 6.7e8");
   }
 
+  // This is dealing with parsing, so I doubt we need one for R32
   Result result;
   switch (opcode) {
     case Opcode::I32Const:
@@ -1634,6 +1635,12 @@ Result WastParser::ParseConst(Const* const_) {
     case Opcode::F64Const:
       const_->type = Type::F64;
       result = ParseDouble(literal.type, s, end, &const_->f64_bits);
+      break;
+
+    case Opcode::R32Const:
+      const_->type = Type::R32;
+      result =
+        ParseInt32(s, end, &const_->u32, ParseIntType::SignedAndUnsigned);
       break;
 
     case Opcode::V128Const:

@@ -221,7 +221,7 @@ class BinaryReaderIR : public BinaryReaderNop {
   Result OnInitExprGetGlobalExpr(Index index, Index global_index) override;
   Result OnInitExprI32ConstExpr(Index index, uint32_t value) override;
   Result OnInitExprI64ConstExpr(Index index, uint64_t value) override;
-  Result OnInitExprR32ConstExpr(Index index, uint32_t value) override;
+  Result OnInitExprR32ConstExpr(Index index, uint32_t value) override; // Should value be type r32 similarly to v128?
 
  private:
   bool HandleError(ErrorLevel, Offset offset, const char* message);
