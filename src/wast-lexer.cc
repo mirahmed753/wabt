@@ -311,6 +311,7 @@ Token WastLexer::GetToken(WastParser* parser) {
       <i> "i64.const"           { RETURN_OPCODE(Const, I64Const); }
       <i> "f32.const"           { RETURN_OPCODE(Const, F32Const); }
       <i> "f64.const"           { RETURN_OPCODE(Const, F64Const); }
+      <i> "r32.const"           { RETURN_OPCODE(Const, R32Const); }
       <i> "i32.eqz"             { RETURN_OPCODE(Convert, I32Eqz); }
       <i> "i64.eqz"             { RETURN_OPCODE(Convert, I64Eqz); }
       <i> "i32.clz"             { RETURN_OPCODE(Unary, I32Clz); }
