@@ -54,6 +54,7 @@ WABT_OPCODE(___,  ___,  ___,  ___,  0,  0,    0x10, Call, "call")
 WABT_OPCODE(___,  ___,  ___,  ___,  0,  0,    0x11, CallIndirect, "call_indirect")
 WABT_OPCODE(___,  ___,  ___,  ___,  0,  0,    0x1a, Drop, "drop")
 WABT_OPCODE(___,  ___,  ___,  ___,  0,  0,    0x1b, Select, "select")
+WABT_OPCODE(R32,  ___,  ___,  ___,  0,  0,    0x1c, R32Const, "r32.const")
 WABT_OPCODE(___,  ___,  ___,  ___,  0,  0,    0x20, GetLocal, "get_local")
 WABT_OPCODE(___,  ___,  ___,  ___,  0,  0,    0x21, SetLocal, "set_local")
 WABT_OPCODE(___,  ___,  ___,  ___,  0,  0,    0x22, TeeLocal, "tee_local")
@@ -211,8 +212,6 @@ WABT_OPCODE(I32,  F32,  ___,  ___,  0,  0,    0xbc, I32ReinterpretF32, "i32.rein
 WABT_OPCODE(I64,  F64,  ___,  ___,  0,  0,    0xbd, I64ReinterpretF64, "i64.reinterpret/f64")
 WABT_OPCODE(F32,  I32,  ___,  ___,  0,  0,    0xbe, F32ReinterpretI32, "f32.reinterpret/i32")
 WABT_OPCODE(F64,  I64,  ___,  ___,  0,  0,    0xbf, F64ReinterpretI64, "f64.reinterpret/i64")
-
-WABT_OPCODE(R32,  ___,  ___,  ___,  0,  0,    0x1c, R32Const, "r32.const")
 
 /* Sign-extension opcodes (--enable-sign-extension) */
 WABT_OPCODE(I32,  I32,  ___,  ___,  0,  0,    0xC0, I32Extend8S, "i32.extend8_s")
