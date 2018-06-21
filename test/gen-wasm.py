@@ -250,6 +250,7 @@ NAMED_VALUES = {
     "i64.reinterpret/f64": 0xbd,
     "f32.reinterpret/i32": 0xbe,
     "f64.reinterpret/i64": 0xbf,
+    "r32.const": 0xc5,
 }
 
 keywords = {
